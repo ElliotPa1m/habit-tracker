@@ -14,11 +14,11 @@ export default function Dashboard() {
     }, [])
 
     async function fetchHabits() {
-        const {data, error} = await supabase
+        const { data, error } = await supabase
             .from('habits')
             .select('*')
-            .order('created_at', { ascending: true})
-        
+            .order('created_at', { ascending: true })
+
         if (error) console.error(error)
         else setHabits(data)
         setLoading(false)
@@ -97,34 +97,63 @@ export default function Dashboard() {
     if (loading) return <p>Loading...</p>
 
     return (
-        <div>
-            <button onClick={signOut}>Log out</button>
+        <div className={styles.page}>
+            <nav className={styles.navbar}>
+                <span className={styles.logo}>Habit Tracker</span>
+                <button className={styles.logoutBtn} onClick={signOut}>Log out</button>
+            </nav>
 
-            <h1>My habits</h1>
+            <div className={styles.body}>
+                <div className={styles.stats}>
+                    <div className={styles.stat}>
+                        <div className={styles.statLabel}>Today</div>
+                        <div className={styles.statValue}>
+                            {completedToday.length} / {habits.length}
+                        </div>
+                    </div>
+                    <div className={styles.stat}>
+                        <div className={styles.statLabel}>Streak</div>
+                        <div className={styles.statValue}>— days</div>
+                    </div>
+                    <div className={styles.stat}>
+                        <div className={styles.statLabel}>This week</div>
+                        <div className={styles.statValue}>— %</div>
+                    </div>
+                </div>
 
-            <form onSubmit={addHabits}>
-                <input
-                    type="text"
-                    placeholder="New habit..."
-                    value={newHabitName}
-                    onChange={e => setNewHabitName(e.target.value)}
-                />
-                <button type="submit">Add</button>
-            </form>
+                <form onSubmit={addHabits} className={styles.addForm}>
+                    <input
+                        className={styles.addInput}
+                        type="text"
+                        placeholder="Add a new habit..."
+                        value={newHabitName}
+                        onChange={e => setNewHabitName(e.target.value)}
+                    />
+                    <button type="submit" className={styles.addBtn}>+ Add</button>
+                </form>
 
-            {habits.length === 0 && <p>No habits yet. Add one!</p>}
+                <div className={styles.sectionLabel}>Today's habits</div>
 
-            <ul>
-                {habits.map(habit => (
-                    <li key={habit.id}>
-                        <button onClick={() => toggleCompletion(habit.id)}>
-                            {completedToday.includes(habit.id) ? '☑️' : '⬜'}
-                        </button>
-                        <span>{habit.icon} {habit.name}</span>
-                        <button onClick={() => deleteHabit(habit.id)}>Delete</button>
-                    </li>
-                ))}
-            </ul>
+                {habits.length === 0 && <p className={styles.empty}>No habits yet — add one above!</p>}
+
+                <div className={styles.habits}>
+                    {habits.map(habit => {
+                        const done = completedToday.includes(habit.id)
+                        return (
+                            <div key={habit.id} className={`${styles.habit} ${done ? styles.habitDone : ''}`}>
+                                <button className={`${styles.checkBtn} ${done ? styles.checkBtnDone : ''}`} onClick={() => toggleCompletion(habit.id)}>
+                                    {done ? '✓' : ''}
+                                </button>
+                                <span className={styles.habitName}>{habit.icon} {habit.name}</span>
+                                <span className={done ? styles.streak : styles.streakZero}>
+                                    0 day streak
+                                </span>
+                                <button className={styles.deleteBtn} onClick={() => deleteHabit(habit.id)}>✕</button>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
         </div>
     )
 }
