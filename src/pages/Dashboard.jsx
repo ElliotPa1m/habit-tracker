@@ -144,7 +144,7 @@ export default function Dashboard() {
                                 <button className={`${styles.checkBtn} ${done ? styles.checkBtnDone : ''}`} onClick={() => toggleCompletion(habit.id)}>
                                     {done ? '✓' : ''}
                                 </button>
-                                <span className={styles.habitName}>{habit.icon} {habit.name}</span>
+                                <span className={styles.habitName}>{habit.name}</span>
                                 <span className={done ? styles.streak : styles.streakZero}>
                                     0 day streak
                                 </span>
