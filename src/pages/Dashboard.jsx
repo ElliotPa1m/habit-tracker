@@ -7,6 +7,7 @@ export default function Dashboard() {
     const [newHabitName, setNewHabitName] = useState('')
     const [loading, setLoading] = useState(true)
     const [completedToday, setCompletedToday] = useState([])
+    const [allCompletions, setAllCompletions] = useState([])
 
     useEffect(() => {
         fetchHabits()
@@ -29,11 +30,17 @@ export default function Dashboard() {
 
         const { data, error } = await supabase
             .from('completions')
-            .select('habit_id')
-            .eq('completed_date', today)
+            .select('habit_id, completed_date')
 
         if (error) console.error(error)
-        else setCompletedToday(data.map(c => c.habit_id))
+        else {
+            setCompletedToday(
+                data
+                    .filter(c => c.completed_date === today)
+                    .map(c => c.habit_id)
+            )
+            setAllCompletions(data)
+        }
     }
 
     async function toggleCompletion(habitId) {
@@ -96,6 +103,24 @@ export default function Dashboard() {
 
     if (loading) return <p>Loading...</p>
 
+    function calculateStreak(habitId, completions) {
+        let streak = 0
+        const today = new Date()
+
+        for (let i = 1; i <= 365; i++) {
+            const date = new Date(today)
+            date.setDate(today.getDate() - i)
+            const dateStr = date.toISOString().split('T')[0]
+
+            if (completions.includes(dateStr)) {
+            } else {
+                break
+            }
+        }
+
+        return streak
+    }
+
     return (
         <div className={styles.page}>
             <nav className={styles.navbar}>
@@ -139,14 +164,15 @@ export default function Dashboard() {
                 <div className={styles.habits}>
                     {habits.map(habit => {
                         const done = completedToday.includes(habit.id)
+                        const streak = calculateStreak(habit.id)
                         return (
                             <div key={habit.id} className={`${styles.habit} ${done ? styles.habitDone : ''}`}>
                                 <button className={`${styles.checkBtn} ${done ? styles.checkBtnDone : ''}`} onClick={() => toggleCompletion(habit.id)}>
                                     {done ? '✓' : ''}
                                 </button>
                                 <span className={styles.habitName}>{habit.name}</span>
-                                <span className={done ? styles.streak : styles.streakZero}>
-                                    0 day streak
+                                <span className={streak > 0 ? styles.streak : styles.streakZero}>
+                                    {streak} day streak
                                 </span>
                                 <button className={styles.deleteBtn} onClick={() => deleteHabit(habit.id)}>✕</button>
                             </div>
