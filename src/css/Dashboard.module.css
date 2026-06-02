@@ -219,3 +219,23 @@
     padding: 2px 8px;
     white-space: nowrap;
 }
+
+.achievementsBtn {
+    background: rgba(0, 0, 0, 0.08);
+    border: 0.5px solid rgba(0, 0, 0, 0.15);
+    color: var(--navbar-text);
+    font-size: 12px;
+    padding: 5px 14px;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+}
+
+.achievementsBtn:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+.navRight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}

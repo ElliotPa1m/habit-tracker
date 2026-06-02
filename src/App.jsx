@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { supabase } from './lib/supabase'
 import Dashboard from './pages/Dashboard'
 import Login from './pages/Login'
+import Achievements from './pages/Achievements'
 
 function App() {
   const [session, setSession] = useState(undefined)
@@ -26,6 +27,7 @@ function App() {
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
         <Route path="/" element={session ? <Dashboard /> : <Navigate to="/login" />} />
+        <Route path="/achievements" element={session ? <Achievements /> : <Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   )

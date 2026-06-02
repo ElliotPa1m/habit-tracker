@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabase"
 import styles from '../css/Dashboard.module.css'
+import { useNavigate } from "react-router-dom"
+import { checkAchievements } from '../lib/achievements'
 
 const CATEGORIES = [
     { value: 'physical', label: 'Physical' },
@@ -20,11 +22,16 @@ export default function Dashboard() {
     const [loading, setLoading] = useState(true)
     const [completedToday, setCompletedToday] = useState([])
     const [allCompletions, setAllCompletions] = useState([])
+    const navigate = useNavigate()
 
     useEffect(() => {
         fetchHabits()
         fetchCompletions()
     }, [])
+
+    useEffect(() => {
+        if (habits.length > 0) unlockAchievements()
+    }, [habits, allCompletions])
 
     async function fetchHabits() {
         const { data, error } = await supabase
@@ -169,13 +176,33 @@ export default function Dashboard() {
         return CATEGORIES.find(c => c.value === value)?.label || ''
     }
 
+    async function unlockAchievements() {
+        const { data: existing } = await supabase
+            .from('achievements')
+            .select('achievement_key')
+
+        const unlockedKeys = existing?.map(a => a.achievement_key) || []
+        const { data: { user } } = await supabase.auth.getUser()
+
+        const toUnlock = checkAchievements(habits, allCompletions, unlockedKeys)
+
+        if (toUnlock.length === 0) return
+
+        await supabase
+            .from('achievements')
+            .insert(toUnlock.map(key => ({ user_id: user.id, achievement_key: key })))
+    }
+
     if (loading) return <p>Loading...</p>
 
     return (
         <div className={styles.page}>
             <nav className={styles.navbar}>
                 <span className={styles.logo}>Habit Tracker</span>
-                <button className={styles.logoutBtn} onClick={signOut}>Log out</button>
+                <div className={styles.navRight}>
+                    <button className={styles.achievementsBtn} onClick={() => navigate('/achievements')}>Achievements</button>
+                    <button className={styles.logoutBtn} onClick={signOut}>Log out</button>
+                </div>
             </nav>
 
             <div className={styles.body}>
