@@ -18,39 +18,62 @@ export default function Login() {
             ? await supabase.auth.signUp({ email, password })
             : await supabase.auth.signInWithPassword({ email, password })
 
-            if (error) setError(error.message)
-            setLoading(false)
+        if (error) setError(error.message)
+        setLoading(false)
     }
 
     return (
-        <div className={styles.container}>
-            <form onSubmit={handleSubmit} className={styles.form}>
-                <h1>{isRegister ? 'Create account' : 'Log in'}</h1>
-                <input
-                    type="email"
-                    placeholder="E-mail"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder='Password'
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    required
-                />
+        <div className={styles.page}>
+            <nav className={styles.navbar}>
+                <span className={styles.logo}>Habit Tracker</span>
+            </nav>
 
-                {error && <p className={styles.error}>{error}</p>}
+            <div className={styles.body}>
+                <div className={styles.card}>
+                    <h1 className={styles.title}>
+                        {isRegister ? 'Create account' : 'Welcome back'}
+                    </h1>
+                    <p className={styles.subtitle}>
+                        {isRegister ? 'Start tracking your habits today' : 'Log in to your account'}
+                    </p>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Loading...' : isRegister ? 'Register' : 'Log in'}
-                </button>
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                        <div className={styles.field}>
+                            <label className={styles.label}>Email</label>
+                            <input
+                                className={styles.input}
+                                type="email"
+                                placeholder="you@example.com"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                required
+                            />
+                        </div>
 
-                <button type="button" onClick={() => setIsRegister(!isRegister)}>
-                    {isRegister ? 'Already have an account? Log in!' : 'No account? Make one!'}
-                </button>
-            </form>
+                        <div className={styles.field}>
+                            <label className={styles.label}>Password</label>
+                            <input
+                                className={styles.input}
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={e => setPassword(e.target.value)}
+                                required
+                            />
+                        </div>
+
+                        {error && <p className={styles.error}>{error}</p>}
+
+                        <button type="submit" className={styles.submitBtn} disabled={loading}>
+                            {loading ? 'Loading...' : isRegister ? 'Create account' : 'Log in'}
+                        </button>
+                    </form>
+
+                    <button className={styles.switchBtn} onClick={() => setIsRegister(!isRegister)}>
+                        {isRegister ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
+                    </button>
+                </div>
+            </div>
         </div>
     )
 }
