@@ -2,9 +2,21 @@ import { useState, useEffect } from "react"
 import { supabase } from "../lib/supabase"
 import styles from '../css/Dashboard.module.css'
 
+const CATEGORIES = [
+    { value: 'physical', label: 'Physical' },
+    { value: 'health', label: 'Health' },
+    { value: 'hygiene', label: 'Hygiene' },
+    { value: 'fun', label: 'Fun' },
+    { value: 'relationships', label: 'Relationships' },
+    { value: 'emotional', label: 'Emotional' },
+    { value: 'time', label: 'Time' },
+    { value: 'economics', label: 'Economics' },
+]
+
 export default function Dashboard() {
     const [habits, setHabits] = useState([])
     const [newHabitName, setNewHabitName] = useState('')
+    const [newHabitCategory, setNewHabitCategory] = useState('physical')
     const [loading, setLoading] = useState(true)
     const [completedToday, setCompletedToday] = useState([])
     const [allCompletions, setAllCompletions] = useState([])
@@ -128,7 +140,7 @@ export default function Dashboard() {
 
         const { data, error } = await supabase
             .from('habits')
-            .insert({ name: newHabitName.trim(), user_id: user.id })
+            .insert({ name: newHabitName.trim(), user_id: user.id, category: newHabitCategory })
             .select()
             .single()
 
@@ -151,6 +163,10 @@ export default function Dashboard() {
 
     async function signOut() {
         await supabase.auth.signOut()
+    }
+
+    function getCategoryLabel(value) {
+        return CATEGORIES.find(c => c.value === value)?.label || ''
     }
 
     if (loading) return <p>Loading...</p>
@@ -188,6 +204,12 @@ export default function Dashboard() {
                         value={newHabitName}
                         onChange={e => setNewHabitName(e.target.value)}
                     />
+
+                    <select className={styles.categorySelect} value={newHabitCategory} onChange={e => setNewHabitCategory(e.target.value)}>
+                        {CATEGORIES.map(cat => (
+                            <option key={cat.value} value={cat.value}>{cat.label}</option>
+                        ))}
+                    </select>
                     <button type="submit" className={styles.addBtn}>+ Add</button>
                 </form>
 
@@ -205,6 +227,7 @@ export default function Dashboard() {
                                     {done ? '✓' : ''}
                                 </button>
                                 <span className={styles.habitName}>{habit.name}</span>
+                                <span className={styles.categoryTag}>{getCategoryLabel(habit.category)}</span>
                                 <span className={streak > 0 ? styles.streak : styles.streakZero}>
                                     {streak} day streak
                                 </span>
