@@ -43,6 +43,52 @@ export default function Dashboard() {
         }
     }
 
+    function calculateStreak(habitId) {
+        const dates = allCompletions
+            .filter(c => c.habit_id === habitId)
+            .map(c => c.completed_date)
+
+        let streak = 0
+        const today = new Date()
+
+        for (let i = 1; i <= 365; i++) {
+            const date = new Date(today)
+            date.setDate(today.getDate() - i)
+            const dateStr = date.toISOString().split('T')[0]
+
+            if (dates.includes(dateStr)) {
+                streak++
+            } else {
+                break
+            }
+        }
+
+        return streak
+    }
+
+    function getBestStreak() {
+        if (habits.length === 0) return 0
+        return Math.max(...habits.map(h => calculateStreak(h.id)))
+    }
+
+    function getThisWeekPercent() {
+        if (habits.length === 0) return 0
+        const today = new Date()
+        let total = 0
+        let completed = 0
+
+        for (let i = 0; i < 7; i++) {
+            const date = new Date(today)
+            date.setDate(today.getDate() - i)
+            const dateStr = date.toISOString().split('T')[0]
+
+            total += habits.length
+            completed += allCompletions.filter(c => c.completed_date === dateStr).length
+        }
+
+        return Math.round((completed / total) * 100)
+    }
+
     async function toggleCompletion(habitId) {
         const today = new Date().toISOString().split('T')[0]
         const isCompleted = completedToday.includes(habitId)
@@ -55,7 +101,10 @@ export default function Dashboard() {
                 .eq('completed_date', today)
 
             if (error) console.error(error)
-            else setCompletedToday(completedToday.filter(id => id !== habitId))
+            else {
+                setCompletedToday(completedToday.filter(id => id !== habitId))
+                setAllCompletions(allCompletions.filter(c => !(c.habit_id === habitId && c.completed_date === today)))
+            }
         } else {
             const { data: { user } } = await supabase.auth.getUser()
 
@@ -64,7 +113,10 @@ export default function Dashboard() {
                 .insert({ habit_id: habitId, user_id: user.id, completed_date: today })
 
             if (error) console.error(error)
-            else setCompletedToday([...completedToday, habitId])
+            else {
+                setCompletedToday([...completedToday, habitId])
+                setAllCompletions([...allCompletions, { habit_id: habitId, completed_date: today }])
+            }
         }
     }
 
@@ -103,24 +155,6 @@ export default function Dashboard() {
 
     if (loading) return <p>Loading...</p>
 
-    function calculateStreak(habitId, completions) {
-        let streak = 0
-        const today = new Date()
-
-        for (let i = 1; i <= 365; i++) {
-            const date = new Date(today)
-            date.setDate(today.getDate() - i)
-            const dateStr = date.toISOString().split('T')[0]
-
-            if (completions.includes(dateStr)) {
-            } else {
-                break
-            }
-        }
-
-        return streak
-    }
-
     return (
         <div className={styles.page}>
             <nav className={styles.navbar}>
@@ -137,12 +171,12 @@ export default function Dashboard() {
                         </div>
                     </div>
                     <div className={styles.stat}>
-                        <div className={styles.statLabel}>Streak</div>
-                        <div className={styles.statValue}>— days</div>
+                        <div className={styles.statLabel}>Best streak</div>
+                        <div className={styles.statValue}>{getBestStreak()} days</div>
                     </div>
                     <div className={styles.stat}>
                         <div className={styles.statLabel}>This week</div>
-                        <div className={styles.statValue}>— %</div>
+                        <div className={styles.statValue}>{getThisWeekPercent()}%</div>
                     </div>
                 </div>
 
