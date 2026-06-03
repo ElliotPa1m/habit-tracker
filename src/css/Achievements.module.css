@@ -63,10 +63,12 @@
     border: 0.5px solid var(--border);
     padding: 12px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 10px;
     transition: all 0.15s;
     min-width: 0;
+    min-height: auto;
+    height: auto;
 }
 
 .cardUnlocked {
@@ -115,4 +117,18 @@
     color: var(--muted);
     text-transform: uppercase;
     margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .groupsGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .body {
+        padding: 16px;
+    }
 }
