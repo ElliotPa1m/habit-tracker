@@ -27,6 +27,7 @@ export default function Dashboard() {
     useEffect(() => {
         fetchHabits()
         fetchCompletions()
+        requestNotificationPermission()
     }, [])
 
     useEffect(() => {
@@ -193,6 +194,21 @@ export default function Dashboard() {
             .insert(toUnlock.map(key => ({ user_id: user.id, achievement_key: key })))
     }
 
+    async function requestNotificationPermission() {
+        if ('Notification' in window && Notification.permission === 'default') {
+            await Notification.requestPermission()
+        }
+    }
+
+    function sendTestNotification() {
+        if (Notification.permission === 'granted') {
+            new Notification('Habit Tracker', {
+                body: "Don't forget to check off your habits today!",
+                icon: '/icon-192.png'
+            })
+        }
+    }
+
     if (loading) return <p>Loading...</p>
 
     return (
@@ -200,6 +216,7 @@ export default function Dashboard() {
             <nav className={styles.navbar}>
                 <span className={styles.logo}>Habit Tracker</span>
                 <div className={styles.navRight}>
+                    <button onClick={sendTestNotification}>Test notis</button>
                     <button className={styles.achievementsBtn} onClick={() => navigate('/achievements')}>Achievements</button>
                     <button className={styles.logoutBtn} onClick={signOut}>Log out</button>
                 </div>
