@@ -200,12 +200,15 @@ export default function Dashboard() {
         }
     }
 
-    function sendTestNotification() {
+    async function sendTestNotification() {
         if (Notification.permission === 'granted') {
-            new Notification('Habit Tracker', {
-                body: "Don't forget to check off your habits today!",
-                icon: '/icon-192.png'
-            })
+            const registration = await navigator.serviceWorker.getRegistration()
+            if (registration) {
+                registration.showNotification('Habit Tracker', {
+                    body: "Don't forget to check off your habits today!",
+                    icon: '/icon-192.png'
+                })
+            }
         }
     }
 
