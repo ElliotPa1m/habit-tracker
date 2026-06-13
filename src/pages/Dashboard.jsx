@@ -219,7 +219,6 @@ export default function Dashboard() {
             <nav className={styles.navbar}>
                 <span className={styles.logo}>Habit Tracker</span>
                 <div className={styles.navRight}>
-                    <button onClick={sendTestNotification}>Test notis</button>
                     <button className={styles.achievementsBtn} onClick={() => navigate('/achievements')}>Achievements</button>
                     <button className={styles.logoutBtn} onClick={signOut}>Log out</button>
                 </div>
