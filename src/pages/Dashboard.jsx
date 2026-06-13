@@ -27,7 +27,7 @@ export default function Dashboard() {
     useEffect(() => {
         fetchHabits()
         fetchCompletions()
-        requestNotificationPermission()
+        // requestNotificationPermission()
     }, [])
 
     useEffect(() => {
@@ -200,17 +200,17 @@ export default function Dashboard() {
         }
     }
 
-    async function sendTestNotification() {
-        if (Notification.permission === 'granted') {
-            const registration = await navigator.serviceWorker.getRegistration()
-            if (registration) {
-                registration.showNotification('Habit Tracker', {
-                    body: "Don't forget to check off your habits today!",
-                    icon: '/icon-192.png'
-                })
-            }
-        }
-    }
+    // async function sendTestNotification() {
+    //     if (Notification.permission === 'granted') {
+    //         const registration = await navigator.serviceWorker.getRegistration()
+    //         if (registration) {
+    //             registration.showNotification('Habit Tracker', {
+    //                 body: "Don't forget to check off your habits today!",
+    //                 icon: '/icon-192.png'
+    //             })
+    //         }
+    //     }
+    // }
 
     if (loading) return <p>Loading...</p>
 
