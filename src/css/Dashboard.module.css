@@ -239,3 +239,31 @@
     align-items: center;
     gap: 8px;
 }
+
+@media (max-width: 768px) {
+    .body {
+        padding: 16px;
+    }
+
+    .stats {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .addForm {
+        flex-wrap: wrap;
+    }
+
+    .addInput {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .categorySelect {
+        flex: 1;
+    }
+
+    .addBtn {
+        width: 100%;
+    }
+}
